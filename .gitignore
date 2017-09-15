@@ -1,0 +1,5 @@
+*.c
+*.o
+*.pyc
+*.dll
+__pycache__/
