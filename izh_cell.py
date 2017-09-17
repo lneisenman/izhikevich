@@ -3,10 +3,10 @@
 from __future__ import (print_function, division, absolute_import,
                         unicode_literals)
 
-from neuron import h, load_mechanisms
+from neuron import h
 
 
-#load_mechanisms('./mod_files')    # load the model dll files
+h.nrn_load_dll("./mod_files/nrnmech.dll")    # load the model dll files
 
 
 class IzhCell():

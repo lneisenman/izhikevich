@@ -142,10 +142,11 @@ def read_baseline(file_name='baseline.csv'):
 
 if __name__ == "__main__":
     ''' '''
-    print('hello')
+    plt.style.use({'axes.spines.top': False, 'axes.spines.right': False})
+
     h.load_file("stdrun.hoc")
     simulate()
-#    simulate_pair()
+    simulate_pair()
 #    test_noise()
 #    simulate_net()
 #    read_baseline()
