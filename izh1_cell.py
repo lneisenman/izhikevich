@@ -5,6 +5,7 @@ from __future__ import (print_function, division, absolute_import,
 
 from neuron import h
 
+from ranstream import RandomStream
 
 h.nrn_load_dll("./mod_files/nrnmech.dll")    # load the model dll files
 
@@ -14,7 +15,7 @@ class IzhCell():
     A python version of the icell template from Ted's Izhmodel with the synapse
     model from Brette et al 2007
     """
-    def __init__(self):
+    def __init__(self, seed=0, noise=1):
         self.soma = h.Section(name="soma")
         h.pt3dclear()
         h.pt3dadd(0, 0, 0, 1)
@@ -26,13 +27,22 @@ class IzhCell():
         self.soma.cm = 1
         self.soma.insert('pas')
         self.soma.g_pas = 5e-5
-        self.soma.e_pas = -70
-        self.izh = h.Izh(0.5, sec=self.soma)
+        self.soma.e_pas = -60
+        self.izh = h.Izh1(0.5, sec=self.soma)
         self.izh.amp = 0
         self.all = h.SectionList()
         self.all.append()
+        self.seed = seed
+        self.noise = noise
+        self.insert_noise()
         self.make_synapses()
-        self.add_stim()
+
+    def insert_noise(self):
+        self.rs = RandomStream(self.seed)
+        self.izh.mean = 0
+        self.izh.stdev = self.noise
+        self.rs.normal(0, 1)
+        self.izh.noiseFromRandom(self.rs.r)
 
     def position(self, x, y, z):
         for i in range(h.n3d()):
@@ -55,19 +65,6 @@ class IzhCell():
         syn.tau = 10
         syn.e = -80
         self.synlist.append(syn)
-
-    def add_stim(self):
-        stim = h.NetStim()
-        stim.interval = 50
-        stim.noise = 1
-        stim.start = 50
-        stim.number = 1e12
-        self.stim = stim
-
-        con = h.NetCon(stim, self.synlist[0])
-        con.weight[0] = 0.0001
-        con.delay = 5
-        self.con = con
 
     def connect2target(self, target):
         self.soma.push()
@@ -126,6 +123,7 @@ class IzhCell():
         ''' set params for class 2 behavior '''
         self.set_params(a=0.2, b=0.26, c=-65, d=0)
         self.set_coeffs(e=0.04, f=5, g=140)
+
 
 if __name__ == '__main__':
     print('hello')
